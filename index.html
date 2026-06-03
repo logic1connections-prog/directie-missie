@@ -224,15 +224,39 @@ function initAudio(){
   });
 }
 
+// Duur per scene in seconden
+var DUUR = {
+  "s01":4.66,"s02":3.46,"s03":7.22,"s04":6.42,"s05":5.46,"s06":7.78,
+  "s07":8.26,"s07a":9.62,"s07b":7.38,"s08":3.86,"s09":3.98,"s10":6.26,
+  "s11":7.26,"s12":7.54,"s13":6.82,"s14":6.98,"s15":6.10,"s16":6.98,
+  "s17":7.14,"s18":6.58,"s19":7.30,"s19a":7.06,"s19b":9.22,"s20":7.22,
+  "s21":5.06,"s22":4.06,"s23":7.18,"s24":5.70,"s25":6.50,"s26":5.00,
+  "s27":2.90,"s28":4.90,"s29":8.40,"s29a":7.42,"s30a":5.62,"s30":4.58,
+  "s31":4.78,"s32":3.86,"s33":6.42,"s34":4.58,"s35":7.38,"s36":5.14,
+  "s37":4.10,"s38":8.34,"s39":2.42,"s40":3.38,"s41":2.18,"s42":4.02,
+  "s43":2.82,"s44":3.52,"s45":4.54,"s46":5.36,"s47":2.86,"s48":3.56
+};
+
+var stopTimer = null;
+
 function spreek(tekst, stemtype, sceneId){
   if(!geluidAan || !audioEl) return;
   var t = TIJDEN[sceneId];
   if(t === undefined) return;
-  // Wacht tot audio geladen is, dan speel af
+  
+  // Stop vorige timer
+  if(stopTimer) clearTimeout(stopTimer);
+  
   function doPlay(){
     audioEl.currentTime = t;
     audioEl.play().catch(function(e){ console.log('play error:', e); });
+    // Stop na de duur van deze scene
+    var duur = DUUR[sceneId] || 5;
+    stopTimer = setTimeout(function(){
+      audioEl.pause();
+    }, duur * 1000);
   }
+  
   if(audioEl.readyState >= 2){
     doPlay();
   } else {
@@ -244,6 +268,7 @@ function spreek(tekst, stemtype, sceneId){
 }
 
 function stopSpreek(){
+  if(stopTimer) clearTimeout(stopTimer);
   if(audioEl) audioEl.pause();
 }
 
