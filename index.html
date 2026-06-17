@@ -314,11 +314,11 @@ function laad(id){
   kb.innerHTML='';
 
   if(s.type==='narr'){
-    kb.appendChild(maak('VERDER ▶','k k-verder',function(){volgende(id);}));
+    kb.appendChild(maak('VERDER ▶','k k-verder',function(){stopAudio();volgende(id);}));
   } else if(s.type==='keuze'){
     var sc=s.sc;var sid=id;
-    kb.appendChild(maak('A — '+s.A,'k k-a',function(){kies(sc,'A',sid);}));
-    kb.appendChild(maak('B — '+s.B,'k k-b',function(){kies(sc,'B',sid);}));
+    kb.appendChild(maak('A — '+s.A,'k k-a',function(){stopAudio();kies(sc,'A',sid);}));
+    kb.appendChild(maak('B — '+s.B,'k k-b',function(){stopAudio();kies(sc,'B',sid);}));
   } else if(s.type==='fout'){
     flash('rgba(255,51,68,.3)');
     var g=s.goto;
