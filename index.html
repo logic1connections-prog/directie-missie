@@ -242,14 +242,31 @@ var ORDER=SCENES.filter(function(s){return s.type!=='fout'&&s.type!=='goed';}).m
 var geluidAan=true;
 var huidigAudio=null;
 
+// Pre-converteer alle audio naar Blob URLs bij start
+var BLOB_URLS = {};
+function initBlobUrls(){
+  Object.keys(AUDIO).forEach(function(sid){
+    if(!AUDIO[sid]) return;
+    try {
+      var b64 = AUDIO[sid].split(',')[1];
+      var bin = atob(b64);
+      var arr = new Uint8Array(bin.length);
+      for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+      var blob = new Blob([arr],{type:'audio/mpeg'});
+      BLOB_URLS[sid] = URL.createObjectURL(blob);
+    } catch(e){ console.log('blob err',sid,e); }
+  });
+  console.log('Blob URLs klaar:', Object.keys(BLOB_URLS).length);
+}
+
 function speelAudio(sceneId){
   if(!geluidAan) return;
   if(huidigAudio){huidigAudio.pause();huidigAudio=null;}
-  var src=AUDIO[sceneId];
+  var src = BLOB_URLS[sceneId] || AUDIO[sceneId];
   if(!src) return;
-  var a=new Audio(src);
-  huidigAudio=a;
-  a.play().catch(function(){});
+  var a = new Audio(src);
+  huidigAudio = a;
+  a.play().catch(function(e){ console.log('play err',sceneId,e); });
 }
 
 function stopAudio(){
@@ -266,6 +283,7 @@ function toggleGeluid(){
 function startGame(){
   document.getElementById('intro').style.display='none';
   document.getElementById('game').style.display='flex';
+  initBlobUrls();
   laad('s01');
 }
 
